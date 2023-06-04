@@ -46,22 +46,22 @@ public class OrderController {
     public R<Page> page(int page, int pageSize, String number, String beginTime, String endTime) {
 
         log.info("page:{},pageSize:{},number:{},beginTime:{},endTime:{}", page, pageSize, number, beginTime, endTime);
-        //构造分页构造器
+        // 构造分页构造器
         Page<Orders> ordersPage = new Page<>(page, pageSize);
 
-        //创建条件构造器
+        // 创建条件构造器
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
 
-        //添加查询条件
-        //SQL:select * from orders where number like ? and checkout_time between ? and ? order by checkout_time Desc
-        //如果number不为空，使用like模糊查询
+        // 添加查询条件
+        // SQL:select * from orders where number like ? and checkout_time between ? and ? order by checkout_time Desc
+        // 如果number不为空，使用like模糊查询
         queryWrapper.like(StringUtils.isNotEmpty(number), Orders::getNumber, number);
-        //如果开始和结束时间不为空，使用between添加时间区间
+        // 如果开始和结束时间不为空，使用between添加时间区间
         queryWrapper.between(StringUtils.isNotEmpty(beginTime) && StringUtils.isNotEmpty(endTime), Orders::getCheckoutTime, beginTime, endTime);
-        //按照付款时间降序排序
+        // 按照付款时间降序排序
         queryWrapper.orderByDesc(Orders::getCheckoutTime);
 
-        //根据条件执行分页查询
+        // 根据条件执行分页查询
         orderService.page(ordersPage, queryWrapper);
 
         return R.success(ordersPage);
@@ -69,6 +69,7 @@ public class OrderController {
 
     /**
      * 派送订单
+     *
      * @param order
      * @return
      */
@@ -80,7 +81,7 @@ public class OrderController {
         updateWrapper.eq(Orders::getId, order.getId());
         updateWrapper.set(Orders::getStatus, order.getStatus());
 
-        //SQL:update orders set status = ？ where id = ？
+        // SQL:update orders set status = ？ where id = ？
         orderService.update(updateWrapper);
         return R.success("订单状态更新成功");
     }
