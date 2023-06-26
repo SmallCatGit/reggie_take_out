@@ -1,6 +1,8 @@
 # Mobile Tools for java
 #*.class
 
+src/main/java/com/reggie/utils/SMSUtils.java
+
 # Package Files #
 *.jargit
 *.war
