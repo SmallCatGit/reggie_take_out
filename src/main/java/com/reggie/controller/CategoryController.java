@@ -20,7 +20,7 @@ import java.util.List;
 @RequestMapping("/category")
 public class CategoryController {
     @Autowired
-    private CategoryService categoryService;//注入所需要的Service
+    private CategoryService categoryService;// 注入所需要的Service
 
     /**
      * 新增分类
@@ -45,15 +45,15 @@ public class CategoryController {
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize) {
         log.info("page:{}, pageSize:{}", page, pageSize);
-        //构造分页构造器
+        // 构造分页构造器
         Page<Category> pageInfo = new Page<>(page, pageSize);
 
-        //构建条件构造器
+        // 构建条件构造器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        //添加排序条件，根据sort排序
+        // 添加排序条件，根据sort排序
         queryWrapper.orderByAsc(Category::getSort);
 
-        //进行分页查询
+        // 进行分页查询
         categoryService.page(pageInfo, queryWrapper);
         return R.success(pageInfo);
     }
@@ -69,7 +69,7 @@ public class CategoryController {
         log.info("删除分类，id为：{}", id);
 
 //        categoryService.removeById(id);
-        //调用自定义的删除方法
+        // 调用自定义的删除方法
         categoryService.remove(id);
         return R.success("删除分类信息成功");
     }
@@ -89,16 +89,17 @@ public class CategoryController {
 
     /**
      * 根据条件查询分类数据
+     *
      * @param category
      * @return
      */
     @GetMapping("/list")
-    public R<List<Category>> list (Category category) {
-        //构造条件构造器
+    public R<List<Category>> list(Category category) {
+        // 构造条件构造器
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
-        //添加条件
+        // 添加条件
         queryWrapper.eq(category.getType() != null, Category::getType, category.getType());
-        //添加排序条件，先根据顺序升序排序，如果顺序相同再根据更新时间降序排序
+        // 添加排序条件，先根据顺序升序排序，如果顺序相同再根据更新时间降序排序
         queryWrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
 
         List<Category> list = categoryService.list(queryWrapper);

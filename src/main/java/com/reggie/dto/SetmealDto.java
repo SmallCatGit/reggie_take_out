@@ -12,6 +12,6 @@ public class SetmealDto extends Setmeal {
 
     private List<SetmealDish> setmealDishes;
 
-    //菜品分类名称
+    // 菜品分类名称
     private String categoryName;
 }

@@ -34,31 +34,31 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
      */
     @Override
     public void remove(Long id) {
-        //目的：查询当前分类是否关联了菜品，如果已关联，抛出一个业务异常
+        // 目的：查询当前分类是否关联了菜品，如果已关联，抛出一个业务异常
 
-        //构建菜品条件构造器
+        // 构建菜品条件构造器
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        //添加查询条件，根据分类id进行查询
+        // 添加查询条件，根据分类id进行查询
         dishLambdaQueryWrapper.eq(Dish::getCategoryId, id);
-        //统计查询数量
+        // 统计查询数量
         int dishCount = dishService.count(dishLambdaQueryWrapper);
         if (dishCount > 0) {
-            //已关联菜品，抛出一个业务异常
+            // 已关联菜品，抛出一个业务异常
             throw new CustomException("当前分类下关联了菜品，不能删除");
         }
 
-        //目的：查询当前分类是否关联了套餐，如果已关联，抛出一个业务异常
-        //构建套餐条件构造器
+        // 目的：查询当前分类是否关联了套餐，如果已关联，抛出一个业务异常
+        // 构建套餐条件构造器
         LambdaQueryWrapper<Setmeal> setmealLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        //添加查询条件，根据分类id进行查询
+        // 添加查询条件，根据分类id进行查询
         setmealLambdaQueryWrapper.eq(Setmeal::getCategoryId, id);
-        //统计查询数量
+        // 统计查询数量
         int setmealCount = setmealService.count(setmealLambdaQueryWrapper);
         if (setmealCount > 0) {
-            //已关联套餐，抛出一个业务异常
+            // 已关联套餐，抛出一个业务异常
             throw new CustomException("当前分类下关联了套餐，不能删除");
         }
-        //正常删除
+        // 正常删除
         super.removeById(id);
     }
 }

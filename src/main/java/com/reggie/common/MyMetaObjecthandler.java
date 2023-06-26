@@ -10,11 +10,12 @@ import java.time.LocalDateTime;
 /**
  * 自定义元数据对象处理器
  */
-@Component//让spring框架去管理这个类
+@Component // 让spring框架去管理这个类
 @Slf4j
 public class MyMetaObjecthandler implements MetaObjectHandler {
     /**
      * 插入操作自动填充
+     *
      * @param metaObject
      */
     @Override
@@ -29,6 +30,7 @@ public class MyMetaObjecthandler implements MetaObjectHandler {
 
     /**
      * 修改操作自动填充
+     *
      * @param metaObject
      */
     @Override
@@ -36,7 +38,7 @@ public class MyMetaObjecthandler implements MetaObjectHandler {
         log.info("公共字段自动填充【update】。。。");
         log.info(metaObject.toString());
 
-        //获取当前线程id
+        // 获取当前线程id
         long id = Thread.currentThread().getId();
         log.info("线程id为：{}", id);
 

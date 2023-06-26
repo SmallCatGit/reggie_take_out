@@ -38,7 +38,7 @@ public class DishController {
     private DishFlavorService dishFlavorService;
 
     @Autowired
-    private CategoryService categoryService;//注入分类的service
+    private CategoryService categoryService;// 注入分类的service
 
     /**
      * 新增菜品
@@ -68,50 +68,49 @@ public class DishController {
 
         // 创建分页构造器
         Page<Dish> pageInfo = new Page<>(page, pageSize);
-        //构造dishDto泛型的构造器，用于拷贝dish分页构造器的属性，并且设置页面需要的菜品分类字段
+        // 构造dishDto泛型的构造器，用于拷贝dish分页构造器的属性，并且设置页面需要的菜品分类字段
         Page<DishDto> dishDtoPage = new Page<>();
 
-        //构造条件构造器
+        // 构造条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
 
-        //根据name添加过滤条件
+        // 根据name添加过滤条件
         queryWrapper.like(name != null, Dish::getName, name);
 
-        //根据时间添加降序排序条件
+        // 根据时间添加降序排序条件
         queryWrapper.orderByDesc(Dish::getUpdateTime);
 
-        //调用service执行分页查询
+        // 调用service执行分页查询
         dishService.page(pageInfo, queryWrapper);
 
         // 对象拷贝，并且忽略Page中的参数records
         BeanUtils.copyProperties(pageInfo, dishDtoPage, "records");
 
-        //获取records对应的list集合
+        // 获取records对应的list集合
         List<Dish> records = pageInfo.getRecords();
-        //遍历records，通过流对象，然后map（把每个元素拿出来），通过λ表达式处理，在过程中创建dto对象。最后收集起来赋值给dto对象
-        List<DishDto> list = records.stream().map((item) -> {//item 表示Dish，也就是遍历出来的每一个菜品对象
-            //创建DishDto对象
+        // 遍历records，通过流对象，然后map（把每个元素拿出来），通过λ表达式处理，在过程中创建dto对象。最后收集起来赋值给dto对象
+        List<DishDto> list = records.stream().map((item) -> {// item 表示Dish，也就是遍历出来的每一个菜品对象
+            // 创建DishDto对象
             DishDto dishDto = new DishDto();
-            //将item拷贝给dishDto，目的是为其他属性赋值，item代表每一个Dish对象，里面有Dish对象的属性
-            //noinspection DuplicatedCode
+            // 将item拷贝给dishDto，目的是为其他属性赋值，item代表每一个Dish对象，里面有Dish对象的属性
             BeanUtils.copyProperties(item, dishDto);
 
-            //获取每个菜品对应的分类id
+            // 获取每个菜品对应的分类id
             Long categoryId = item.getCategoryId();
-            //通过categoryService和菜品id获得分类对象
+            // 通过categoryService和菜品id获得分类对象
             Category category = categoryService.getById(categoryId);
 
             if (category != null) {
-                //获取分类名称
+                // 获取分类名称
                 String categoryName = category.getName();
-                //给dishDto中的categoryName赋值
+                // 给dishDto中的categoryName赋值
                 dishDto.setCategoryName(categoryName);
             }
 
             return dishDto;
-        }).collect(Collectors.toList());//收集对象，赋值给DishDto对象
+        }).collect(Collectors.toList());// 收集对象，赋值给DishDto对象
 
-        //设置records
+        // 设置records
         dishDtoPage.setRecords(list);
 
         return R.success(dishDtoPage);
@@ -172,22 +171,22 @@ public class DishController {
      */
     @GetMapping("/list")
     public R<List<DishDto>> list(Dish dish) {
-        //构造条件构造器
+        // 构造条件构造器
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
-        //添加查询条件
+        // 添加查询条件
         queryWrapper.eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId());
 
-        //添加状态的查询条件，只有起售的商品才能查询(状态是1)
+        // 添加状态的查询条件，只有起售的商品才能查询(状态是1)
         queryWrapper.eq(Dish::getStatus, 1);
 
-        //可能有多个值，所以添加一个排序条件
+        // 可能有多个值，所以添加一个排序条件
         queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
 
         List<Dish> list = dishService.list(queryWrapper);
 
         List<DishDto> dishDtoList = list.stream().map(item -> {
             DishDto dishDto = new DishDto();
-            //对象拷贝
+            // 对象拷贝
             BeanUtils.copyProperties(item, dishDto);
 
             /*//获取分类id
@@ -203,12 +202,12 @@ public class DishController {
                 dishDto.setCategoryName(categoryName);
             }*/
 
-            //获取菜品id
+            // 获取菜品id
             Long dishId = item.getId();
-            //构造查询构造器，根据菜品id查询口味表中对应的口味信息
+            // 构造查询构造器，根据菜品id查询口味表中对应的口味信息
             LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper.eq(DishFlavor::getDishId, dishId);
-            //SQL:select * from dish_flavor where dish_id = ?
+            // SQL:select * from dish_flavor where dish_id = ?
             List<DishFlavor> dishFlavorList = dishFlavorService.list(lambdaQueryWrapper);
             dishDto.setFlavors(dishFlavorList);
             return dishDto;
@@ -219,6 +218,7 @@ public class DishController {
 
     /**
      * 根据菜品id批量起售或停售
+     *
      * @param ids
      * @return
      */
@@ -226,23 +226,23 @@ public class DishController {
     public R<String> status(HttpServletRequest request, @RequestParam List<Long> ids) {
         log.info("ids:{}", ids);
 
-        //获取根路径到地址结尾
+        // 获取根路径到地址结尾
         String requestURI = request.getRequestURI();// /dish/status/0
-        //截取出最后的状态信息
+        // 截取出最后的状态信息
 
         /**
-         * substring() 从指定位置返回字符串的子字符串。
-         * lastIndexOf:返回指定字符在此字符串中最后一次出现处的索引，如果此字符串中没有这样的字符，则返回 -1。
+         * substring(): 从指定位置返回字符串的子字符串。
+         * lastIndexOf: 返回指定字符在此字符串中最后一次出现处的索引，如果此字符串中没有这样的字符，则返回 -1。
          * */
 
 //        String substring = requestURI.substring(requestURI.lastIndexOf("/"));// /0
         String status = requestURI.substring(requestURI.lastIndexOf("/") + 1);// 0
 
-        //SQL:update dish set status = ? where id in (...)
+        // SQL:update dish set status = ? where id in (...)
         LambdaUpdateWrapper<Dish> updateWrapper = new LambdaUpdateWrapper<>();
-        //添加修改条件
+        // 添加修改条件
         updateWrapper.in(Dish::getId, ids);
-        //添加修改内容
+        // 添加修改内容
         updateWrapper.set(Dish::getStatus, status);
 
         dishService.update(updateWrapper);

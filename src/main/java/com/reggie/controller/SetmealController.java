@@ -61,35 +61,34 @@ public class SetmealController {
      */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name) {
-        //构造分页构造器
+        // 构造分页构造器
         Page<Setmeal> pageInfo = new Page<>(page, pageSize);
         Page<SetmealDto> dtoPage = new Page<>();
 
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
-        //添加查询条件，根据name进行like模糊查询
+        // 添加查询条件，根据name进行like模糊查询
         queryWrapper.like(name != null, Setmeal::getName, name);
-        //添加排序条件，根据更新时间，添加降序排序
+        // 添加排序条件，根据更新时间，添加降序排序
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
-        //进行分页查询
+        // 进行分页查询
         setmealService.page(pageInfo, queryWrapper);
 
-        //对象拷贝,records不拷贝，因为两个的泛型不一样
+        // 对象拷贝,records不拷贝，因为两个的泛型不一样
         BeanUtils.copyProperties(pageInfo, dtoPage, "records");
         List<Setmeal> records = pageInfo.getRecords();
         List<SetmealDto> list = records.stream().map(item -> {
-            //创建我们需要的setmealDto对象
+            // 创建我们需要的setmealDto对象
             SetmealDto setmealDto = new SetmealDto();
-            //拷贝Stemeal里的属性
-            //noinspection DuplicatedCode
+            // 拷贝Stemeal里的属性
             BeanUtils.copyProperties(item, setmealDto);
 
-            //获取分类id
+            // 获取分类id
             Long categoryId = item.getCategoryId();
-            //根据分类id查询出分类对象
+            // 根据分类id查询出分类对象
             Category category = categoryService.getById(categoryId);
             if (category != null) {
-                //分类名称
+                // 分类名称
                 String categoryName = category.getName();
                 setmealDto.setCategoryName(categoryName);
             }
@@ -120,13 +119,13 @@ public class SetmealController {
      * @return
      */
     @GetMapping("/list")
-    public R<List<Setmeal>> list(Setmeal setmeal) {//穿过来的不是json数据，不需要加注解
+    public R<List<Setmeal>> list(Setmeal setmeal) {// 传过来的不是json数据，不需要加注解
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(setmeal.getCategoryId() != null, Setmeal::getCategoryId, setmeal.getCategoryId());
         queryWrapper.eq(setmeal.getStatus() != null, Setmeal::getStatus, setmeal.getStatus());
         queryWrapper.orderByDesc(Setmeal::getUpdateTime);
 
-        //SQL:select * from setmeal where category_id = ? and status = ? order by update_time desc
+        // SQL:select * from setmeal where category_id = ? and status = ? order by update_time desc
         List<Setmeal> setmealList = setmealService.list(queryWrapper);
 
         return R.success(setmealList);
@@ -170,20 +169,20 @@ public class SetmealController {
     public R<String> status(@RequestParam List<Long> ids, HttpServletRequest request) {
         log.info("ids:{}", ids);
 
-        //获取请求地址
+        // 获取请求地址
         String uri = request.getRequestURI();
 
-        //获取状态
+        // 获取状态
         String status = uri.substring(uri.lastIndexOf("/") + 1);
 
-        //创建更新构造器
+        // 创建更新构造器
         LambdaUpdateWrapper<Setmeal> updateWrapper = new LambdaUpdateWrapper<>();
 
-        //根据状态和id更新数据
+        // 根据状态和id更新数据
         updateWrapper.in(Setmeal::getId, ids);
         updateWrapper.set(Setmeal::getStatus, status);
 
-        //使用service执行修改
+        // 使用service执行修改
         setmealService.update(updateWrapper);
 
         return R.success("状态更新成功");

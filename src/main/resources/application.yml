@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   application:
-    #应用的名称，可选项
+    # 应用的名称，可选项
     name: reggie_take_out
   datasource:
     druid:
@@ -12,16 +12,16 @@ spring:
       password: 1234
 mybatis-plus:
   configuration:
-    #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
-    #开启下面这个（true）就可通过mybatis-plus实现
-    #表名address_book-->AddressBook，
-    #字段名user_name-->userName的映射
+    # 在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射
+    # 开启下面这个（true）就可通过mybatis-plus实现
+    # 表名address_book-->AddressBook，
+    # 字段名user_name-->userName的映射
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       id-type: ASSIGN_ID
-#自定义配置名
+# 自定义配置名
 reggie:
-  #指定文件上传路径
+  # 指定文件上传路径
   path: E:\JavaWeb\test\
