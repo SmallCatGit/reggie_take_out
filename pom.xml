@@ -56,6 +56,11 @@
             <version>1.18.20</version>
         </dependency>
 
+        <!--fastjaon：阿里巴巴的开源JSON解析库，速度快，但是FastJson在复杂类型的Bean转换Json上会出现一些问题，可能会出现引用的类型，导致Json转换出错，需要制定引用
+        Jackson所依赖的jar包较少，简单易用。
+        与其他Java的json的框架Gson等相比，Jackson解析大的json文件速度比较快。
+        Jackson运行时占用内存比较低，性能比较好
+        Jackson有灵活的API，可以很容易进行扩展和定制。-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
